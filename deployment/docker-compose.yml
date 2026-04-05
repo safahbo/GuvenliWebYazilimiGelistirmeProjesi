@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  vms-api:
+    build: 
+      context: ../
+      dockerfile: deployment/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DB_PATH=/app/db_data/vms.sqlite
+    volumes:
+      - vms-data:/app/db_data
+    networks:
+      - secure_internal
+    
+    # --- HARDCORE SECURITY CONSTRAINTS ---
+    read_only: true       # CWE-434: Prevents malicious file uploads to container OS
+    tmpfs:
+      - /tmp              # Temporary memory storage for runtime operations
+    cap_drop:
+      - ALL               # Drops all Linux kernel capabilities (prevents privilege escalation)
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'    # Mitigates DoS by limiting CPU starvation
+          memory: 256M    # Mitigates DoS by limiting Memory exhaustion
+
+networks:
+  secure_internal:
+    driver: bridge
+    internal: true        # Completely isolated from external network interfaces
+
+volumes:
+  vms-data:
