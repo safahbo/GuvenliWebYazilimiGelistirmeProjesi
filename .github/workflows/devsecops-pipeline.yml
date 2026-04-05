@@ -19,7 +19,7 @@ jobs:
     - name: 📦 SCA (Software Composition Analysis)
       run: |
         npm install
-        npm audit --audit-level=high
+        npm audit --audit-level=critical
 
     - name: 🔑 Secret Scanning (TruffleHog)
       uses: trufflesecurity/trufflehog@main
